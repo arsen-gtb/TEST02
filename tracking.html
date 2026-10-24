@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking Delivery Order - SITTA UT</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+</head>
+<body>
+    <div id="app" class="container">
+        <header>
+            <a href="index.html" class="btn-back">⬅ BACK</a>
+            <h1>Tracking & Entry Delivery Order (DO)</h1>
+        </header>
+
+        <section class="form-panel">
+            <h3>📝 Entry Delivery Order Baru</h3>
+            <form @submit.prevent="buatOrder">
+                <div class="form-grid">
+                    <div>
+                        <label>Nomor DO (Otomatis):</label>
+                        <input type="text" :value="nextDoNumber" readonly class="input-disabled">
+                    </div>
+                    <div>
+                        <label>NIM Mahasiswa:</label>
+                        <input type="text" v-model="formOrder.nim" required placeholder="Masukkan NIM">
+                    </div>
+                    <div>
+                        <label>Nama Penerima:</label>
+                        <input type="text" v-model="formOrder.nama" required placeholder="Nama Lengkap">
+                    </div>
+                    <div>
+                        <label>Ekspedisi Pengiriman:</label>
+                        <select v-model="formOrder.ekspedisi" required>
+                            <option value="">-- Pilih Ekspedisi --</option>
+                            <option v-for="exp in pengirimanList" :value="exp.kode">{{ exp.nama }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Pilih Paket Bahan Ajar:</label>
+                        <select v-model="formOrder.paket" required>
+                            <option value="">-- Pilih Paket --</option>
+                            <option v-for="pkt in paket" :value="pkt.kode">{{ pkt.kode }} - {{ pkt.nama }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Tanggal Pengiriman:</label>
+                        <input type="date" v-model="formOrder.tanggalKirim" required>
+                    </div>
+                </div>
+
+                <div v-if="detailPaketTerpilih" class="detail-box">
+                    <h4>📦 Informasi Isi Paket Terpilih:</h4>
+                    <ul>
+                        <li v-for="buku in detailPaketTerpilih.isi" :key="buku">Mata Kuliah: <strong>{{ buku }}</strong></li>
+                    </ul>
+                    <p>Total Tagihan: <strong class="text-success">Rp {{ detailPaketTerpilih.harga.toLocaleString('id-ID') }}</strong></p>
+                </div>
+
+                <button type="submit" class="btn-submit">Submit Order Baru</button>
+            </form>
+        </section>
+
+        <section class="tracking-list">
+            <h3>📋 Manifest Tracking DO Terdaftar</h3>
+            <div v-for="(detail, key) in tracking" :key="key" class="tracking-card">
+                <div class="card-header">
+                    <h4>📦 Nomor DO: {{ key }}</h4>
+                    <span class="badge status-warning">{{ detail.status }}</span>
+                </div>
+                <div class="card-body">
+                    <p><strong>NIM / Nama:</strong> {{ detail.nim }} - {{ detail.nama }}</p>
+                    <p><strong>Ekspedisi / Tanggal Kirim:</strong> {{ detail.ekspedisi }} / {{ detail.tanggalKirim }}</p>
+                    <p><strong>Paket Buku:</strong> {{ detail.paket }} (Total: Rp {{ detail.total.toLocaleString('id-ID') }})</p>
+                    
+                    <h5>📍 Riwayat Log Perjalanan:</h5>
+                    <ul class="timeline">
+                        <li v-for="log in detail.perjalanan">
+                            <small class="text-muted">[{{ log.waktu }}]</small> - {{ log.keterangan }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/tracking-app.js"></script>
+</body>
+</html>
